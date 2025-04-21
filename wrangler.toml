@@ -6,7 +6,4 @@ account_id  = "8cf8307d5c06b5ed178b49ef076dc03e"            # from Dashboard →
 workers_dev = false                          # deploy to your own zone, not *.workers.dev
 
 # Bind this Worker to 8bit.am/search* (must include zone_name)
-route = { 
-  pattern   = "8bit.am/search*",             # match any /search path on 8bit.am
-  zone_name = "8bit.am"                      # your Cloudflare zone name
-}
+route = { pattern = "8bit.am/search*", zone_name = "8bit.am" }

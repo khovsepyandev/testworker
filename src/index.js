@@ -1,26 +1,24 @@
 addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
-  // Only intercept /search (and anything beneath it)
   if (url.pathname.startsWith("/search")) {
-    // Rebuild the URL to point at your backend
+    // Build the backend URL
     const backendUrl = new URL(event.request.url);
     backendUrl.protocol = "https";
     backendUrl.hostname = "khovsepyan.com";
     backendUrl.pathname = "/some/path";
-    // query string (e.g. ?q=foo) is preserved automatically
 
-    // Forward the original request to the backend
+    // Proxy the original request (no auto‑redirect)
     const proxyReq = new Request(backendUrl.toString(), {
       method: event.request.method,
       headers: event.request.headers,
       body: event.request.body,
-      redirect: "manual", // do not auto‑follow backend redirects
+      redirect: "manual",
     });
 
     return event.respondWith(
       fetch(proxyReq).then((res) => {
-        // If the backend issues a redirect, rewrite it back to 8bit.am
+        // If the backend issues a redirect, rewrite Location→ 8bit.am
         if (res.status >= 300 && res.status < 400) {
           const loc = res.headers.get("Location");
           if (loc) {
@@ -32,7 +30,7 @@ addEventListener("fetch", (event) => {
             });
           }
         }
-        // Otherwise, stream the backend’s response directly
+        // Otherwise, stream the response as‑is
         return new Response(res.body, {
           status: res.status,
           headers: res.headers,
@@ -41,6 +39,6 @@ addEventListener("fetch", (event) => {
     );
   }
 
-  // For all other requests, fall back to your origin
+  // All other requests → normal origin
   return event.respondWith(fetch(event.request));
 });
