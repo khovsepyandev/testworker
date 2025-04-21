@@ -1,25 +1,28 @@
 addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
+  // Only proxy /search and deeper paths
   if (url.pathname.startsWith("/search")) {
-    // rewrite to your GCP service
-    const backend = new URL(event.request.url);
-    backend.hostname = "khovsepyan.com";
-    backend.protocol = "https";
-    backend.pathname = "/some/path";
+    // Build the target URL at khovsepyan.com/some/path
+    const backendUrl = new URL(event.request.url);
+    backendUrl.protocol = "https";
+    backendUrl.hostname = "khovsepyan.com";
+    backendUrl.pathname = "/some/path";
+    // query string (?foo=bar) is preserved
 
-    const proxyReq = new Request(backend.toString(), {
+    // Forward the original request (method, headers, body) to the backend
+    const proxyReq = new Request(backendUrl.toString(), {
       method: event.request.method,
       headers: event.request.headers,
       body: event.request.body,
       redirect: "manual",
     });
-    // If you need Host: xyz.com on the backend, uncomment:
-    // proxyReq.headers.set("Host", "xyz.com");
+    // If your backend strictly checks Host, uncomment:
+    // proxyReq.headers.set("Host", "khovsepyan.com");
 
     return event.respondWith(fetch(proxyReq));
   }
 
-  // all other paths fall through to origin
+  // All other traffic falls back automatically to your origin
   return event.respondWith(fetch(event.request));
 });

@@ -1,4 +1,13 @@
-name               = "cloud-run-proxy"           # your worker’s name
-main               = "src/index.js"              # entry‑point
-compatibility_date = "2025-04-21"                # ISO date (today or later)
-# no "assets" block needed for a pure proxy script
+name        = "cloud-run-proxy"       # your Worker’s name in Cloudflare
+main        = "src/index.js"          # entry‑point of your script
+compatibility_date = "2025-04-21"     # today’s date or later, in YYYY-MM-DD
+
+account_id  = "8cf8307d5c06b5ed178b49ef076dc03e"     # found in Cloudflare dashboard → Overview
+workers_dev = false                   # deploy to a custom domain, not workers.dev
+
+# Bind the Worker only to requests matching 8bit.am/search*
+# Explicitly include your zone name (required by CF)
+route = { 
+  pattern   = "8bit.am/search*", 
+  zone_name = "8bit.am" 
+}
