@@ -1,13 +1,12 @@
-name        = "cloud-run-proxy"       # your Worker’s name in Cloudflare
-main        = "src/index.js"          # entry‑point of your script
-compatibility_date = "2025-04-21"     # today’s date or later, in YYYY-MM-DD
+name               = "cloud-run-proxy"       # your Worker’s name
+main               = "src/index.js"          # entrypoint of your script
+compatibility_date = "2025-04-21"            # ISO date (today or later)
 
-account_id  = "8cf8307d5c06b5ed178b49ef076dc03e"     # found in Cloudflare dashboard → Overview
-workers_dev = false                   # deploy to a custom domain, not workers.dev
+account_id  = "8cf8307d5c06b5ed178b49ef076dc03e"            # from Dashboard → Workers → Overview
+workers_dev = false                          # deploy to your own zone, not *.workers.dev
 
-# Bind the Worker only to requests matching 8bit.am/search*
-# Explicitly include your zone name (required by CF)
+# Bind this Worker to 8bit.am/search* (must include zone_name)
 route = { 
-  pattern   = "8bit.am/search*", 
-  zone_name = "8bit.am" 
+  pattern   = "8bit.am/search*",             # match any /search path on 8bit.am
+  zone_name = "8bit.am"                      # your Cloudflare zone name
 }
