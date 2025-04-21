@@ -1,8 +1,9 @@
-name               = "testworker"                    # matches your Worker name
-main               = "src/index.js"                  # entry‑point
-compatibility_date = "2025-04-21"                    # today’s date or later
-account_id         = "8cf8307d5c06b5ed178b49ef076dc03e"             # Workers → Overview
-workers_dev        = false                           # use your custom domain
+name               = "testworker"               # Your Worker’s name in Cloudflare
+main               = "src/index.js"             # Worker entry file
+compatibility_date = "2025-04-21"               # YYYY-MM-DD (today or later)
 
-# Bind only /search* on 8bit.am
+account_id  = "8cf8307d5c06b5ed178b49ef076dc03e"               # From Dashboard → Workers → Overview
+workers_dev = false                             # Deploy to your custom domain, not workers.dev
+
+# Bind this Worker to any path under 8bit.am/search
 route = { pattern = "8bit.am/search*", zone_name = "8bit.am" }
