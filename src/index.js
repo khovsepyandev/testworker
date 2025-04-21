@@ -1,39 +1,38 @@
 addEventListener("fetch", (event) => {
-  event.respondWith(handle(event));
+  event.respondWith(handle(event.request));
 });
 
-async function handle(event) {
-  try {
-    const url = new URL(event.request.url);
+async function handle(request) {
+  const url = new URL(request.url);
 
-    if (url.pathname.startsWith("/search")) {
-      // Build backend URL
-      const backendUrl = new URL(event.request.url);
-      backendUrl.protocol = "https";
-      backendUrl.hostname = "khovsepyan.com";
-      backendUrl.pathname = "/some/path";
+  // Only proxy anything under /search
+  if (url.pathname.startsWith("/search")) {
+    // Compute the “suffix” path (what comes after /search)
+    const suffix = url.pathname.substring("/search".length);
+    // e.g. "/products/widget"
 
-      const proxyReq = new Request(backendUrl.toString(), {
-        method: event.request.method,
-        headers: event.request.headers,
-        body: event.request.body,
-        redirect: "manual",
-      });
+    // Build the backend URL: khovsepyan.com/some/path + suffix
+    const backendUrl = new URL(request.url);
+    backendUrl.protocol = "https";
+    backendUrl.hostname = "khovsepyan.com";
+    backendUrl.pathname = `/some/path${suffix}`;
+    // Query string is preserved automatically
 
-      const res = await fetch(proxyReq);
-      // Handle redirects (optional) or just return:
-      return new Response(res.body, {
-        status: res.status,
-        headers: res.headers,
-      });
-    }
+    // Forward the request to the backend
+    const response = await fetch(backendUrl.toString(), {
+      method: request.method,
+      headers: request.headers,
+      body: request.body,
+      // By default fetch() follows 3xx redirects
+    });
 
-    // Fallback
-    return fetch(event.request);
-  } catch (err) {
-    // Log the full stack to Cloudflare logs
-    console.error("Worker error:", err);
-    // Return a simple 500 so you can still inspect the log
-    return new Response("Internal Worker error", { status: 500 });
+    // Return the backend’s response unmodified
+    return new Response(response.body, {
+      status: response.status,
+      headers: response.headers,
+    });
   }
+
+  // All other requests → normal route (WordPress origin)
+  return fetch(request);
 }
