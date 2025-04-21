@@ -1,0 +1,4 @@
+name               = "cloud-run-proxy"           # your worker’s name
+main               = "src/index.js"              # entry‑point
+compatibility_date = "2025-04-21"                # ISO date (today or later)
+# no "assets" block needed for a pure proxy script
